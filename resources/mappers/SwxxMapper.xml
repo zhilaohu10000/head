@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- namespace,指定要实现的接口 全限定名 -->
+<mapper namespace="com.zyzh.dao.SwxxDao">
+    <!--  <resultMap id="BysxxMap" type="Bysxx">
+          <id property="id" column="id"></id>
+          <result property="xm" column="xm"></result>
+          <result property="yx" column="yx"></result>
+          <result property="zy" column="zy"></result>
+          <result property="xn" column="xn"></result>
+          <association property="swxx"  javaType="Swxx">
+
+              <result property="swbm" column="swbm"></result>
+              <result property="sw" column="sw"></result>
+          </association>
+      </resultMap>-->
+    <!--查询所有事务信息-->
+    <!--<select id="selectSwxx" resultType="BysSwxx">
+       select b1.xm,b1.yx,b1.zy,b1.xn,b1.id,s1.swbm,s1.sw from X_BYSXX b1 JOIN  X_SWXX s1 ON s1.bysbh =b1.id
+    </select>-->
+    <!--查询所有职能部门-->
+    <select id="selectAllZnbm" resultType="string">
+      select swbm from X_SWXX GROUP BY SWBM
+    </select>
+    <!--根据学号查询毕业生未处理事务-->
+    <select id="selectSwxxByXh" resultType="Swxx">
+      select sw from X_SWXX where bysbh =#{xh} and swblzt ='未处理'
+    </select>
+    <!--根据学号查询毕业生未处理事务-->
+    <select id="selectSwxxByBysbh" resultType="Swxx">
+      select swbm,sw,swblzt,swblsj,bysbh from X_SWXX where bysbh =#{xh}
+    </select>
+    <!--根据事务部门查询所有未处理事务-->
+    <select id="selectAllSwxxBySwbm" resultType="Swxx">
+        select swbm,sw,swblzt,swblsj,bysbh from X_SWXX
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="swbm!=null and swbm!=''">
+                swbm =#{swbm}
+            </if>
+        </trim>
+    </select>
+    <!--根据事务部门和学号查询毕业生未处理事务-->
+    <select id="selectSwxxBySwbm" resultType="Swxx">
+      select swbm,sw,swblzt,swblsj,bysbh from X_SWXX where bysbh =#{swxx.bysbh} and swbm=#{swxx.swbm}
+    </select>
+    <!--查询有未处理事项的毕业生人数-->
+    <select id="selectAllWclsxCount" resultType="int">
+        select count(*) from (select count(*) from (select S1.swblzt,S1.BYSBH from x_bysxx b1 join x_swxx s1 on
+        b1.xh=s1.bysbh
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="yx!=null and yx!=''">
+                yx =#{yx} and
+            </if>
+            <if test="xn!=null and xn!=''">
+                xn =#{xn}
+            </if>
+        </trim>
+        ) where SWBLZT='未处理' GROUP BY BYSBH)
+    </select>
+    <!--分类查询所有事务信息-->
+    <!--<select id="selectAllCount" resultType="int">
+      select count(id) from X_BYSXX b1 JOIN  X_SWXX s1 ON s1.bysbh =b1.xh
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="yx!=null and yx!= ''">
+                b1.yx =#{yx} and
+            </if>
+            <if test="xn!=null and xn!=''">
+                b1.xn =#{xn} and
+            </if>
+            <if test="swbm!=null and swbm!=''">
+                s1.swbm =#{swbm}
+            </if>
+        </trim>
+    </select>-->
+    <!--分类查询所有事务信息-->
+    <select id="selectSwxx" resultType="BysSwxx">
+        SELECT xh,xm,yx,zy,xn,swblsj,sw,SWBM,SWBLZT FROM(SELECT A.*, ROWNUM RN
+        FROM (SELECT xh,xm,yx,zy,xn,swblsj,sw,SWBM,SWBLZT FROM (
+        select b1.xm,b1.yx,b1.zy,b1.xn,b1.xh,s1.swbm,s1.sw,s1.swblzt,s1.swblsj from X_BYSXX b1 JOIN X_SWXX s1 ON
+        s1.bysbh =b1.xh
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="swxx.xn!=null and swxx.xn!=''">
+                b1.xn=#{swxx.xn} and
+            </if>
+            <if test="swxx.xh!=null and swxx.xh!=''">
+                b1.xh=#{swxx.xh} AND
+            </if>
+            <if test="swxx.xm!=null and swxx.xm!=''">
+                b1.xm=#{swxx.xm} AND
+            </if>
+            <if test="swxx.yx!=null and swxx.yx!=''">
+                b1.yx=#{swxx.yx} AND
+            </if>
+            <if test="swxx.zy!=null and swxx.zy!=''">
+                b1.zy=#{swxx.zy} AND
+            </if>
+            <if test="swxx.bj!=null and swxx.bj!=''">
+                b1.bj=#{swxx.bj} AND
+            </if>
+            <if test="swxx.swblzt!=null and swxx.swblzt!=''">
+                s1.swblzt=#{swxx.swblzt} AND
+            </if>
+            <if test="swxx.swblsj!=null ">
+                s1.swblsj=#{swxx.swblsj} AND
+            </if>
+            <if test="swxx.swbm!=null and swxx.swbm!=''">
+                s1.swbm=#{swxx.swbm}
+            </if>
+        </trim>
+        ))A
+        WHERE ROWNUM &lt;=#{end}
+        )
+        WHERE RN &gt;= #{start}
+    </select>
+
+    <!--分类查询所有事务信息总条数-->
+    <select id="selectSwxxCount" resultType="int">
+        select count(*) from X_BYSXX b1 JOIN X_SWXX s1 ON s1.bysbh =b1.xh
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="swxx.xn!=null and swxx.xn!=''">
+                b1.xn=#{swxx.xn} and
+            </if>
+            <if test="swxx.xh!=null and swxx.xh!=''">
+                b1.xh=#{swxx.xh} AND
+            </if>
+            <if test="swxx.xm!=null and swxx.xm!=''">
+                b1.xm=#{swxx.xm} AND
+            </if>
+            <if test="swxx.yx!=null and swxx.yx!=''">
+                b1.yx=#{swxx.yx} AND
+            </if>
+            <if test="swxx.zy!=null and swxx.zy!=''">
+                b1.zy=#{swxx.zy} AND
+            </if>
+            <if test="swxx.bj!=null and swxx.bj!=''">
+                b1.bj=#{swxx.bj} AND
+            </if>
+            <if test="swxx.swblzt!=null and swxx.swblzt!=''">
+                s1.swblzt=#{swxx.swblzt} AND
+            </if>
+            <if test="swxx.swblsj!=null ">
+                s1.swblsj=#{swxx.swblsj} AND
+            </if>
+            <if test="swxx.swbm!=null and swxx.swbm!=''">
+                s1.swbm=#{swxx.swbm}
+            </if>
+        </trim>
+    </select>
+    <!--添加事务信息-->
+    <insert id="insertSwxx">
+        <selectKey resultType="string" keyProperty="id" order="BEFORE">
+            select seq_swxxId.nextval from dual
+        </selectKey>
+        insert into x_swxx (id,swbm,sw,bysbh,swblzt,fzrbh)VALUES
+        (#{id},#{swxx.swbm},#{swxx.sw},#{swxx.bysbh},#{swxx.swblzt},#{swxx.fzrbh})
+    </insert>
+    <!--添加事务信息-->
+    <insert id="insertAllSwxx" useGeneratedKeys="true" parameterType="java.util.List">
+        <selectKey resultType="string" keyProperty="id" order="BEFORE">
+            select seq_swxxId.nextval from dual
+        </selectKey>
+        insert into x_swxx (id,swbm,sw,bysbh,swblzt,fzrbh)VALUES
+        <foreach collection="list" item="swxx" index="index" separator=",">
+            (#{id},#{swxx.swbm},#{swxx.sw},#{swxx.bysbh},#{swxx.swblzt},#{swxx.fzrbh})
+        </foreach>
+    </insert>
+    <!--修改事务信息-->
+    <update id="updateSwxx">
+        update X_SWXX
+        <trim prefix="SET" prefixOverrides=",">
+            <if test="swxx.swblzt!=null">
+                swblzt=#{swxx.swblzt}
+            </if>
+            <if test="swxx.swblsj!=null">
+                ,swblsj=#{swxx.swblsj}
+            </if>
+        </trim>
+        where bysbh=#{swxx.bysbh} and swbm=#{swxx.swbm}
+    </update>
+    <!--修改事务信息-->
+    <update id="updateSwxxCX">
+        update X_SWXX set swblzt=#{swxx.swblzt},swblsj=null where bysbh=#{swxx.bysbh} and swbm=#{swxx.swbm}
+    </update>
+
+    <!--根据学年，院系，职能部门查询事务信息总数量-->
+    <select id="selectAllCount" resultType="int">
+        select count(*) from X_BYSXX b1 JOIN X_SWXX s1 ON s1.bysbh =b1.xh
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="yx!=null and yx!= ''">
+                b1.yx =#{yx} and
+            </if>
+            <if test="xn!=null and xn!=''">
+                b1.xn =#{xn} and
+            </if>
+            <if test="swbm!=null and swbm!=''">
+                s1.swbm =#{swbm}
+            </if>
+        </trim>
+
+    </select>
+    <!--根据学年，院系，职能部门查询事务信息已办理的总数量-->
+    <select id="selectYblswCount" resultType="int">
+        select count(*) from X_BYSXX b1 JOIN X_SWXX s1 ON s1.bysbh =b1.xh
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="yx!=null and yx!=''">
+                b1.yx =#{yx} AND
+            </if>
+            <if test="xn!=null and xn!=''">
+                b1.xn =#{xn} and
+            </if>
+            <if test="swbm!=null and swbm!=''">
+                s1.swbm =#{swbm} and
+            </if>
+            s1.swblzt='已处理'
+        </trim>
+    </select>
+    <!--根据职能部门查询每日事务办理人数-->
+    <select id="selectSwxxCountByDay" resultType="int">
+        select count(*) from X_SWXX
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="swbm!=null and swbm!=''">
+                swbm =#{swbm} AND
+            </if>
+                swblsj =#{date}
+        </trim>
+    </select>
+
+    <!--根据院系查询每日毕业证领取人数-->
+    <select id="selectAllDate" resultType="date">
+        select swblsj from X_SWXX where swblsj is not NULL
+    </select>
+</mapper>

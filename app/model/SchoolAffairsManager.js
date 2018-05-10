@@ -1,0 +1,9 @@
+Ext.define('XBSF.model.SchoolAffairsManager',{
+    extend:'Ext.data.Model',
+    fields:[
+        {name:'xn',type:'string'},
+        {name:'swbm',type:'string'},
+        {name:'sw',type:'string'},
+        {name:'swblzt',type:'string'}
+    ]
+});

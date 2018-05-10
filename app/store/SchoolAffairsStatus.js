@@ -1,0 +1,10 @@
+Ext.define('XBSF.store.SchoolAffairsStatus',{
+    extend:'Ext.data.Store',
+    model:'XBSF.model.SchoolAffairsStatus',
+    autoLoad:true,
+    proxy:{
+        type:'ajax',
+        url:'swxx/swblTj.do',
+        data:'json'
+    }
+});

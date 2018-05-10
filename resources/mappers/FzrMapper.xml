@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- namespace,指定要实现的接口 全限定名 -->
+<mapper namespace="com.zyzh.dao.FzrDao">
+    <!-- 查询所有负责人 -->
+    <select id="selectAllFzr" resultType="Fzr">
+      select szbm,bksfzr,yjsfzr,znbmfzr from x_fzr where flbh=#{flbh}
+    </select>
+    <!-- 根据id查询负责人 -->
+    <select id="selectSzbm" resultType="Fzr">
+      select szbm,bksfzr,yjsfzr,znbmfzr,flbh,id,qx from x_fzr where flbh='0' and id=#{id}
+    </select>
+    <!-- 查询职能部门负责人编号 -->
+    <select id="selectZnbmFzrMc" resultType="string">
+      select id from x_fzr where szbm=#{szbm}
+    </select>
+    <!-- 根据负责人名称查询部门名称 -->
+    <select id="selectBmByName" resultType="Fzr">
+      select szbm,bksfzr,yjsfzr,znbmfzr,flbh,id,qx from x_fzr where znbmfzr=#{name}
+    </select>
+
+    <!-- 根据部门名称查询 -->
+    <select id="selectBmBySzbm" resultType="Fzr">
+      select szbm,bksfzr,yjsfzr,znbmfzr,flbh,id,qx from x_fzr where szbm=#{name}
+    </select>
+    <!-- 查询所有院系名称 -->
+    <select id="selectAllYx" resultType="string">
+      select szbm from x_fzr where flbh=1
+    </select>
+    <!-- 查询所有数量 -->
+    <select id="selectAllCount" resultType="int">
+        select count(id) from x_fzr
+    </select>
+    <!--添加用户 -->
+    <insert id="insertFzr" >
+            <selectKey resultType="string" keyProperty="id" order="BEFORE">
+                select seq_lxnf.nextval from dual
+            </selectKey>
+            insert into x_fzr (id,szbm,bksfzr,yjsfzr,znbmfzr,qx,flbh)VALUES (#{id},#{fzr.szbm,jdbcType=VARCHAR},#{fzr.bksfzr,jdbcType=VARCHAR},#{fzr.yjsfzr,jdbcType=VARCHAR},#{fzr.znbmfzr,jdbcType=VARCHAR},#{fzr.qx,jdbcType=VARCHAR},#{fzr.flbh})
+    </insert>
+
+    <!--修改用户信息-->
+    <update id="updateYxFzr">
+        update X_fzr
+        <trim  prefix="SET" prefixOverrides=",">
+            <if test="fzr.bksfzr!=null and fzr.bksfzr !=''">
+                bksfzr=#{fzr.bksfzr}
+            </if>
+            <if test="fzr.yjsfzr!=null and fzr.yjsfzr !=''">
+                ,yjsfzr=#{fzr.yjsfzr}
+            </if>
+            <if test="fzr.znbmfzr!=null and fzr.znbmfzr !=''">
+                ,znbmfzr=#{fzr.znbmfzr}
+            </if>
+            <if test="fzr.qx!=null and fzr.qx !=''">
+                ,qx=#{fzr.qx}
+            </if>
+        </trim>
+        where szbm=#{fzr.szbm}
+    </update>
+</mapper>

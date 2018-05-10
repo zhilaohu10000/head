@@ -1,0 +1,11 @@
+Ext.define('XBSF.model.SchoolAffairsStatus',{
+    extend:'Ext.data.Model',
+    fields:[
+        {name:'xn',type:'string'},
+        {name:'yx',type:'string'},
+        {name:'swbm',type:'string'},
+        {name:'allNum',type:'int'},
+        {name:'okNum',type:'int'},
+        {name:'errorNum',type:'int'}
+    ]
+});

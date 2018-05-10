@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:aop="http://www.springframework.org/schema/aop"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util.xsd
+		">
+    <!-- 开启注解方式扫描 -->
+    <context:component-scan base-package="com.zyzh.controller">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!-- 引入小配置文件 -->
+    <context:property-placeholder location="classpath:conf/db.properties"/>
+    <!-- 配置阿里druid的数据源 -->
+    <bean id="dataSourceOne" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${oracle.driverClassName}"></property>
+        <property name="url" value="${oracle.url}"></property>
+        <property name="username" value="${oracle.username}"></property>
+        <property name="password" value="${oracle.password}"></property>
+    </bean>
+    <!-- mysql配置阿里druid的数据源 -->
+    <bean id="mysqldataTwo" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${mysql.driver}" />
+        <property name="url" value="${mysql.url}" />
+        <property name="username" value="${mysql.username}" />
+        <property name="password" value="${mysql.password}" />
+    </bean>
+
+    <!--动态数据源-->
+    <bean id="dataSource" class="com.zyzh.util.DynamicDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry value-ref="dataSourceOne" key="dataSourceOne"></entry>
+                <entry value-ref="mysqldataTwo" key="mysqldataTwo"></entry>
+            </map>
+        </property>
+        <!-- 默认目标数据源为主库数据源 -->
+        <property name="defaultTargetDataSource" ref="dataSourceOne">
+        </property>
+    </bean>
+    <!-- sqlSessionFactory -->
+    <bean id="sqlSessionfactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations" value="classpath:mappers/*.xml" />
+        <property name="typeAliasesPackage" value="com.zyzh.entity" />
+    </bean>
+    <!-- 创建dao实现类的对象 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionfactory" />
+        <property name="basePackage" value="com.zyzh.dao" />
+    </bean>
+    <!-- 创建DataSourceTransactionManager -->
+    <bean id="txm" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <bean id="springContextUtil" class="com.zyzh.util.ApplicationContextUtil"/>
+    <!-- 开启事务注解功能 -->
+    <tx:annotation-driven transaction-manager="txm"/>
+</beans>

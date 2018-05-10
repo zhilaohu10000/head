@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- namespace,指定要实现的接口 全限定名 -->
+<mapper namespace="com.zyzh.dao.BysxxDao">
+    <!-- <select id="selectAllBysxx" resultType="Bysxx">
+        select xh,xm,yx,zy,xn from X_BYSXX
+     </select>-->
+    <!--根据院系查询毕业生数量-->
+    <select id="selectAllCount" resultType="int">
+        select count(xh) from X_BYSXX
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="yx!=null and yx!= ''">
+                yx =#{yx} and
+            </if>
+            <if test="xn!=null and xn!=''">
+                xn =#{xn} and
+            </if>
+        </trim>
+
+    </select>
+    <!--根据院系查询毕业证已领取人数-->
+    <select id="selectAllByzlqCount" resultType="int">
+        select count(xh) from X_BYSXX
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="yx!=null and yx!=''">
+                yx =#{yx} AND
+            </if>
+            <if test="xn!=null and xn!=''">
+                xn =#{xn} and
+            </if>
+            byzlqzt = '已办理'
+        </trim>
+    </select>
+    <!--根据学号查询毕业生信息-->
+    <select id="selectBysxxByXh" resultType="Bysxx">
+        select xh,xm,yx,zy,xn,bj,byzlqzt,byzlqsj from X_BYSXX where xh=#{xh}
+    </select>
+    <!--查询所有毕业生信息-->
+    <select id="selectAllBys" resultType="Bysxx">
+        select xh,xm,yx,zy,xn,bj,byzlqzt,byzlqsj from X_BYSXX
+    </select>
+    <!--查询所有院系名称-->
+    <select id="selectAllYxMc" resultType="string">
+       select yx from X_BYSXX GROUP BY yx
+    </select>
+    <!--分类查询所有毕业生信息-->
+    <select id="selectAllBysxxByYx" resultType="Bysxx">
+        SELECT xh,xm,yx,zy,xn,bj,byzlqzt,byzlqsj FROM(SELECT A.*, ROWNUM RN
+        FROM (SELECT xh,xm,yx,zy,xn,bj,byzlqzt,byzlqsj FROM x_bysxx
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="bysxx.xn!=null and bysxx.xn!=''">
+                xn=#{bysxx.xn} and
+            </if>
+            <if test="bysxx.xh!=null and bysxx.xh!=''">
+                xh=#{bysxx.xh} AND
+            </if>
+            <if test="bysxx.xm!=null and bysxx.xm!=''">
+                xm=#{bysxx.xm} AND
+            </if>
+            <if test="bysxx.yx!=null and bysxx.yx!=''">
+                yx=#{bysxx.yx} AND
+            </if>
+            <if test="bysxx.zy!=null and bysxx.zy!=''">
+                zy=#{bysxx.zy} AND
+            </if>
+            <if test="bysxx.bj!=null and bysxx.bj!=''">
+                bj=#{bysxx.bj} AND
+            </if>
+            <if test="bysxx.byzlqzt!=null and bysxx.byzlqzt!=''">
+                byzlqzt=#{bysxx.byzlqzt} AND
+            </if>
+            <if test="bysxx.byzlqsj!=null ">
+                byzlqsj=#{bysxx.byzlqsj} AND
+            </if>
+            <if test="bysxx.bj!=null and bysxx.bj!=''">
+                bj=#{bysxx.bj}
+            </if>
+        </trim>
+        ORDER BY XH)A
+        WHERE ROWNUM &lt;=#{end}
+        )
+        WHERE RN &gt;= #{start}
+    </select>
+    <!--分类查询所有毕业生信息-->
+    <select id="selectAllBysxxByYxCount" resultType="int">
+        SELECT count(*) FROM x_bysxx
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="bysxx.xn!=null and bysxx.xn!=''">
+                xn=#{bysxx.xn} and
+            </if>
+            <if test="bysxx.xh!=null and bysxx.xh!=''">
+                xh=#{bysxx.xh} AND
+            </if>
+            <if test="bysxx.xm!=null and bysxx.xm!=''">
+                xm=#{bysxx.xm} AND
+            </if>
+            <if test="bysxx.yx!=null and bysxx.yx!=''">
+                yx=#{bysxx.yx} AND
+            </if>
+            <if test="bysxx.zy!=null and bysxx.zy!=''">
+                zy=#{bysxx.zy} AND
+            </if>
+            <if test="bysxx.bj!=null and bysxx.bj!=''">
+                bj=#{bysxx.bj} AND
+            </if>
+            <if test="bysxx.byzlqzt!=null and bysxx.byzlqzt!=''">
+                byzlqzt=#{bysxx.byzlqzt} AND
+            </if>
+            <if test="bysxx.byzlqsj!=null ">
+                byzlqsj=#{bysxx.byzlqsj} AND
+            </if>
+            <if test="bysxx.bj!=null and bysxx.bj!=''">
+                bj=#{bysxx.bj}
+            </if>
+        </trim>
+    </select>
+    <!--分类查询所有毕业生信息-->
+    <select id="selectAllBysxx" resultType="BysSwxx">
+        SELECT xh,xm,yx,zy,xn,bj,byzlqzt,byzlqsj,sw,SWBM,SWBLZT FROM(SELECT A.*, ROWNUM RN
+        FROM (SELECT xh,xm,yx,zy,xn,bj,byzlqzt,byzlqsj,sw,SWBM,SWBLZT FROM (
+        select B1.xh,B1.xm,B1.yx,B1.zy,B1.xn,B1.bj,B1.byzlqzt,B1.byzlqsj,S1.SW,S1.SWBM,S1.SWBLZT from X_BYSXX B1 LEFT
+        JOIN X_SWXX S1 ON B1.XH=S1.BYSBH
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="bysxx.xn!=null and bysxx.xn!=''">
+                xn=#{bysxx.xn} and
+            </if>
+            <if test="bysxx.xh!=null and bysxx.xh!=''">
+                xh=#{bysxx.xh} AND
+            </if>
+            <if test="bysxx.xm!=null and bysxx.xm!=''">
+                xm=#{bysxx.xm} AND
+            </if>
+            <if test="bysxx.yx!=null and bysxx.yx!=''">
+                yx=#{bysxx.yx} AND
+            </if>
+            <if test="bysxx.zy!=null and bysxx.zy!=''">
+                zy=#{bysxx.zy} AND
+            </if>
+            <if test="bysxx.bj!=null and bysxx.bj!=''">
+                bj=#{bysxx.bj} AND
+            </if>
+            <if test="bysxx.byzlqzt!=null and bysxx.byzlqzt!=''">
+                byzlqzt=#{bysxx.byzlqzt} AND
+            </if>
+            <if test="bysxx.byzlqsj!=null ">
+                byzlqsj=#{bysxx.byzlqsj} AND
+            </if>
+            <if test="bysxx.bj!=null and bysxx.bj!=''">
+                bj=#{bysxx.bj}
+            </if>
+        </trim>
+        ORDER BY B1.XH))A
+        WHERE ROWNUM &lt;=#{end}
+        )
+        WHERE RN &gt;= #{start}
+    </select>
+    <!--分类查询所有毕业生信息数量-->
+    <select id="selectBysxxCount" resultType="int">
+        select count(*) from X_BYSXX B1 LEFT JOIN X_SWXX S1 ON B1.XH=S1.BYSBH
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="bysxx.xn!=null and bysxx.xn!=''">
+                xn=#{bysxx.xn} and
+            </if>
+            <if test="bysxx.xh!=null and bysxx.xh!=''">
+                xh=#{bysxx.xh} AND
+            </if>
+            <if test="bysxx.xm!=null and bysxx.xm!=''">
+                xm=#{bysxx.xm} AND
+            </if>
+            <if test="bysxx.yx!=null and bysxx.yx!=''">
+                yx=#{bysxx.yx} AND
+            </if>
+            <if test="bysxx.zy!=null and bysxx.zy!=''">
+                zy=#{bysxx.zy} AND
+            </if>
+            <if test="bysxx.bj!=null and bysxx.bj!=''">
+                bj=#{bysxx.bj} AND
+            </if>
+            <if test="bysxx.byzlqzt!=null and bysxx.byzlqzt!=''">
+                byzlqzt=#{bysxx.byzlqzt} AND
+            </if>
+            <if test="bysxx.byzlqsj!=null ">
+                byzlqsj=#{bysxx.byzlqsj} AND
+            </if>
+            <if test="bysxx.bj!=null and bysxx.bj!=''">
+                bj=#{bysxx.bj}
+            </if>
+        </trim>
+    </select>
+
+    <!--添加单个毕业生信息-->
+    <insert id="insertBys">
+        <!-- <selectKey resultType="string" keyProperty="id" order="BEFORE">
+             select seq_lxnf.nextval from dual
+         </selectKey>-->
+        insert into X_BYSXX (xh,xm,yx,zy,xn,bj,byzlqzt)VALUES
+        (#{bysxx.xh},#{bysxx.xm},#{bysxx.yx},#{bysxx.zy},#{bysxx.xn},#{bysxx.bj},#{bysxx.byzlqzt})
+    </insert>
+    <!--添加多个毕业生信息-->
+    <insert id="insertAllBysxx" useGeneratedKeys="true" parameterType="java.util.List">
+        <!-- <selectKey resultType="string" keyProperty="id" order="BEFORE">
+             select seq_lxnf.nextval from dual
+         </selectKey>-->
+        insert into X_BYSXX (xh,xm,yx,zy,xn,bj,byzlqzt)VALUES
+        <foreach collection="list" item="bysxx" index="index" separator="," >
+        (#{bysxx.xh},#{bysxx.xm},#{bysxx.yx},#{bysxx.zy},#{bysxx.xn},#{bysxx.bj},#{bysxx.byzlqzt})
+        </foreach>
+    </insert>
+    <!--修改毕业生信息-->
+    <update id="updateBysxx">
+        update X_BYSXX
+        <trim prefix="SET" prefixOverrides=",">
+            <if test="bysxx.xn!=null">
+                xn=#{bysxx.xn}
+            </if>
+            <if test="bysxx.xh!=null">
+                ,xh=#{bysxx.xh}
+            </if>
+            <if test="bysxx.xm!=null">
+                ,xm=#{bysxx.xm}
+            </if>
+            <if test="bysxx.yx!=null">
+                ,yx=#{bysxx.yx}
+            </if>
+            <if test="bysxx.zy!=null">
+                ,zy=#{bysxx.zy}
+            </if>
+            <if test="bysxx.bj!=null">
+                ,bj=#{bysxx.bj}
+            </if>
+            <if test="bysxx.byzlqzt!=null">
+                ,byzlqzt=#{bysxx.byzlqzt}
+            </if>
+            <if test="bysxx.byzlqsj!=null">
+                ,byzlqsj=#{bysxx.byzlqsj}
+            </if>
+        </trim>
+        where xh=#{bysxx.xh}
+    </update>
+    <!--修改毕业证信息-->
+    <update id="updateBysxxByz">
+        update X_BYSXX
+        <trim suffixOverrides="," prefix="SET">
+            <if test="byzlqzt!=null">
+                byzlqzt=#{byzlqzt}
+            </if>
+            <if test="date!=null">
+                ,byzlqsj=#{date}
+            </if>
+        </trim>
+        where xh=#{xh}
+    </update>
+    <!--修改毕业证信息-->
+    <update id="updateBysxxByzCx">
+        update X_BYSXX  set byzlqzt=#{byzlqzt},byzlqsj=null where xh=#{xh}
+    </update>
+    <!--根据院系查询每日毕业证领取人数-->
+    <select id="selecByzlqCountByDay" resultType="int">
+        select count(*) from X_BYSXX
+        <trim prefix="where" suffixOverrides="AND|OR">
+            <if test="yx!=null and yx!=''">
+                yx =#{yx} AND
+            </if>
+            byzlqsj =#{date}
+        </trim>
+    </select>
+    <!--根据院系查询每日毕业证领取人数-->
+    <select id="selectAllDate" resultType="date">
+        select byzlqsj from X_BYSXX where byzlqsj is not NULL
+    </select>
+</mapper>

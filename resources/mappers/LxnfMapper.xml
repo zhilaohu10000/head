@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- namespace,指定要实现的接口 全限定名 -->
+<mapper namespace="com.zyzh.dao.LxnfDao">
+    <!--<resultMap id="" type="">
+    </resultMap>-->
+    <select id="selectAllLxnf" resultType="Lxnf">
+        select nf,kqsj,jssj,xtzt from X_LXNF order by nf DESC
+    </select>
+
+    <select id="select123AllLxnf" resultType="Lxnf">
+        select nf,kqsj,jssj,xtzt from X_LXNF  WHERE jssj =#{date}
+    </select>
+    <!--根据年份查询当前系统状态-->
+    <select id="selectStatus" resultType="string">
+        select xtzt from X_LXNF where nf=#{nf}
+    </select>
+    <!--根据年份查询当前系统状态-->
+    <select id="selectNf" resultType="string">
+        select nf from X_LXNF where xtzt='已开启'
+    </select>
+    <insert id="insertYear" >
+    <!--<selectKey resultType="String" keyProperty="id" order="BEFORE">
+        select seq_lxnf.nextval from dual
+    </selectKey>-->
+        insert into X_LXNF (nf,xtzt)values(#{year.nf},#{year.xtzt})
+    </insert>
+    <select id="selectAllNf" resultType="String">
+        select nf from X_LXNF ORDER BY nf DESC
+    </select>
+    <update id="updateYear">
+        update X_lXNF
+        <trim suffixOverrides="," prefix="SET">
+            <if test="lxnf.nf!=null">
+                nf=#{lxnf.nf}
+            </if>
+            <if test="lxnf.kqsj!=null">
+                ,kqsj=#{lxnf.kqsj}
+            </if>
+            <if test="lxnf.jssj!=null">
+                ,jssj=#{lxnf.jssj}
+            </if>
+            <if test="lxnf.xtzt!=null">
+                ,xtzt=#{lxnf.xtzt}
+            </if>
+        </trim>
+          where nf=#{year}
+    </update>
+
+</mapper>

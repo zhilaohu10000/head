@@ -1,0 +1,19 @@
+Ext.define('XBSF.store.ParameterStore',{
+    extend:'Ext.data.JsonStore',
+    //defaultRoodId:'root',
+    model:'XBSF.model.ParameterModel',
+    alias:'nfstore',
+    autoLoad:true,
+    proxy:{
+        type:'ajax',
+        url:'lxnf/query.do',
+        reader:'json'
+    }/*,
+    data:[
+        {"id":"2","nf":"2018","kqsj":"","jssj":"","xtzt":"未开启"},
+        {"id":"3","nf":"2017","kqsj":"2017-4-28","jssj":"2017-6-20","xtzt":"关闭"},
+        {"id":"4","nf":"2016","kqsj":"2016/4/28","jssj":"2016/6/20","xtzt":"关闭"},
+        {"id":"5","nf":"2015","kqsj":"2015/4/28","jssj":"2015/6/20","xtzt":"关闭"}
+
+    ]*/
+});
